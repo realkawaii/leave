@@ -10,7 +10,7 @@
 
     <style>
         :root {
-            --primary-color: #4CAF50;
+            --primary-color: #2196F3; /* 改用藍色系，區分新版本 */
             --bg-color: #f4f7f6;
             --text-color: #333;
         }
@@ -41,6 +41,7 @@
         input[type="date"], select, input[type="password"] {
             width: 100%; padding: 12px; border: 1px solid #ddd;
             border-radius: 6px; font-size: 16px; box-sizing: border-box;
+            background-color: #fff;
         }
 
         button {
@@ -48,46 +49,46 @@
             color: white; border: none; border-radius: 6px; font-size: 18px;
             cursor: pointer; transition: background 0.3s;
         }
-        button:hover { background-color: #45a049; }
+        button:hover { background-color: #1976D2; }
         button:disabled { background-color: #ccc; cursor: not-allowed; }
 
-        /* 學生選單區塊 */
-        #student-selection-area {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-            gap: 10px;
-            margin-top: 10px;
-            padding: 15px;
-            background: #f9f9f9;
-            border: 1px solid #eee;
-            border-radius: 6px;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        .student-checkbox {
+        /* 假別按鈕設計 (類似APP按鈕) */
+        .leave-options {
             display: flex;
-            align-items: center;
-            padding: 10px;
-            background: white;
-            border: 1px solid #ddd;
+            gap: 10px;
+        }
+        .leave-option {
+            flex: 1;
+            position: relative;
+        }
+        .leave-option input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+        .leave-btn {
+            display: block;
+            padding: 12px;
+            text-align: center;
+            background: #f0f0f0;
             border-radius: 6px;
             cursor: pointer;
+            border: 2px solid transparent;
+            font-weight: bold;
+            color: #555;
             transition: all 0.2s;
-            font-size: 15px;
         }
-
-        .student-checkbox:hover { background-color: #e8f5e9; border-color: var(--primary-color); }
-        .student-checkbox input { transform: scale(1.2); margin-right: 10px; cursor: pointer; }
-        .student-checkbox.checked { background-color: #e8f5e9; border-color: var(--primary-color); font-weight: bold; }
-
-        .radio-group { display: flex; gap: 15px; margin-top: 5px; }
-        .radio-group label { font-weight: normal; cursor: pointer; display: flex; align-items: center; font-size: 16px;}
-        .radio-group input { margin-right: 8px; width: auto; transform: scale(1.2); }
-
-        /* Admin Section */
-        #admin-section { display: none; margin-top: 40px; border-top: 2px dashed #ccc; padding-top: 20px; }
+        /* 選中狀態 */
+        .leave-option input:checked + .leave-btn {
+            background-color: #e3f2fd;
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
         
+        /* 列表樣式 */
+        .record-list {
+            margin-top: 10px;
+        }
         .record-item {
             display: flex; justify-content: space-between; align-items: center;
             padding: 12px; background: #fff; border-radius: 6px; margin-bottom: 8px;
@@ -102,14 +103,25 @@
         .tag.事假 { background-color: #f39c12; }
         .tag.其他 { background-color: #3498db; }
 
+        /* Admin Action Buttons */
+        .admin-actions button {
+            width: auto;
+            padding: 5px 10px;
+            font-size: 12px;
+            margin-left: 5px;
+            border-radius: 4px;
+        }
+        .btn-edit { background-color: #FF9800; }
+        .btn-delete { background-color: #F44336; }
+        
+        #admin-section { display: none; margin-top: 40px; border-top: 2px dashed #ccc; padding-top: 20px; }
         .admin-login-trigger { text-align: center; margin-top: 50px; font-size: 12px; color: #ccc; }
         .admin-login-trigger a { cursor: pointer; text-decoration: none; color: #ccc; }
-        
+
         #toast {
             visibility: hidden; min-width: 250px; background-color: #333; color: #fff;
             text-align: center; border-radius: 4px; padding: 16px; position: fixed;
             z-index: 999; left: 50%; bottom: 30px; transform: translateX(-50%);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
         #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
         @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
@@ -119,43 +131,52 @@
 <body>
 
     <div class="container">
-        <h1>大吉國中<br><span style="font-size: 0.7em; color: #7f8c8d; font-weight: normal;">學生出缺席回報系統</span></h1>
+        <h1>大吉國中<br><span style="font-size: 0.7em; color: #7f8c8d; font-weight: normal;">學生出缺席回報</span></h1>
         
         <div id="teacher-form">
             <div class="form-group">
-                <label for="date">📅 選擇日期</label>
+                <label for="date">📅 日期</label>
                 <input type="date" id="date">
             </div>
 
             <div class="form-group">
-                <label for="class-select">🏫 選擇班級</label>
+                <label for="class-select">🏫 班級</label>
                 <select id="class-select" onchange="onClassChange()">
                     <option value="" disabled selected>請選擇班級</option>
                     </select>
             </div>
 
             <div class="form-group">
-                <label>👥 選擇請假學生 (可多選)</label>
-                <div id="student-selection-area">
-                    <p style="color: #999; grid-column: 1/-1; text-align: center; padding: 20px;">請先選擇上方班級</p>
-                </div>
+                <label for="student-select">👤 學生姓名</label>
+                <select id="student-select">
+                    <option value="" disabled selected>請先選擇班級</option>
+                </select>
             </div>
 
             <div class="form-group">
-                <label>📝 請假類別</label>
-                <div class="radio-group">
-                    <label><input type="radio" name="leaveType" value="病假" checked> 病假</label>
-                    <label><input type="radio" name="leaveType" value="事假"> 事假</label>
-                    <label><input type="radio" name="leaveType" value="其他"> 其他</label>
+                <label>📝 假別</label>
+                <div class="leave-options">
+                    <div class="leave-option">
+                        <input type="radio" name="leaveType" value="病假" id="type-sick" checked>
+                        <label class="leave-btn" for="type-sick">病假</label>
+                    </div>
+                    <div class="leave-option">
+                        <input type="radio" name="leaveType" value="事假" id="type-personal">
+                        <label class="leave-btn" for="type-personal">事假</label>
+                    </div>
+                    <div class="leave-option">
+                        <input type="radio" name="leaveType" value="其他" id="type-other">
+                        <label class="leave-btn" for="type-other">其他</label>
+                    </div>
                 </div>
             </div>
 
-            <button onclick="submitData()">送出資料</button>
+            <button onclick="submitData()">新增一筆資料</button>
 
             <div class="form-group" style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">
-                <h3 style="font-size: 1.1em; text-align: left; margin-bottom: 10px;">📋 <span id="current-class-name"></span> 今日已登記名單</h3>
-                <div id="teacher-records-container">
-                    <p style="color: #999; font-size: 0.9em;">(選擇班級後顯示)</p>
+                <h3 style="font-size: 1.1em; text-align: left; margin-bottom: 10px;">📋 今日已登錄名單 <span id="current-class-display" style="font-size:0.8em; color:#666;"></span></h3>
+                <div id="teacher-records-container" class="record-list">
+                    <p style="color: #999; font-size: 0.9em;">(尚未有資料)</p>
                 </div>
             </div>
         </div>
@@ -165,32 +186,31 @@
             
             <div id="login-panel">
                 <div class="form-group">
-                    <label>管理員密碼</label>
+                    <label>密碼</label>
                     <input type="password" id="admin-pwd" placeholder="請輸入密碼">
                 </div>
-                <button onclick="checkLogin()" style="background-color: #607d8b;">登入後台</button>
+                <button onclick="checkLogin()" style="background-color: #607d8b;">登入</button>
             </div>
 
             <div id="data-panel" style="display: none;">
                 <div style="text-align: right; margin-bottom: 15px;">
-                    <button onclick="logout()" style="width: auto; padding: 6px 15px; font-size: 14px; background-color: #95a5a6;">登出</button>
+                    <button onclick="logout()" style="width: auto; padding: 6px 15px; background-color: #95a5a6;">登出</button>
                 </div>
 
                 <div class="form-group">
-                    <label>🔍 檢視全校請假紀錄</label>
+                    <label>🔍 篩選日期</label>
                     <input type="date" id="admin-date-filter">
                 </div>
-                <div id="records-container"></div>
+                <div id="records-container" class="record-list"></div>
             </div>
         </div>
-
     </div>
 
     <div class="admin-login-trigger"><a onclick="toggleAdminView()">Admin Login</a></div>
     <div id="toast"></div>
 
     <script>
-        // 1. Firebase 初始化
+        // 1. Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyAeD-SR6_4uhGB1JH5PChkTPqyyNlNZpFY",
             authDomain: "leave-c84f8.firebaseapp.com",
@@ -203,22 +223,23 @@
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // 2. 內建學生資料庫 (自動過濾轉出學生)
+        // 2. 學生名單資料 (完整版)
         const classData = {"101": [{"no": 1, "name": "方祥宇"}, {"no": 2, "name": "吳昕祐"}, {"no": 3, "name": "林祐民"}, {"no": 4, "name": "陳承貿"}, {"no": 5, "name": "陳冠宏"}, {"no": 6, "name": "黃子競"}, {"no": 7, "name": "楊杰諺"}, {"no": 8, "name": "蔡閔硯"}, {"no": 9, "name": "蕭偉凱"}, {"no": 10, "name": "謝明翰"}, {"no": 11, "name": "簡辰恩"}, {"no": 12, "name": "羅冠富"}, {"no": 13, "name": "王律涵"}, {"no": 14, "name": "何芷恩"}, {"no": 15, "name": "李侑欣"}, {"no": 16, "name": "李旻潔"}, {"no": 17, "name": "李芮瑀"}, {"no": 18, "name": "林佑珈"}, {"no": 19, "name": "林芊妤"}, {"no": 20, "name": "洪珮慈"}, {"no": 21, "name": "許語瞳"}, {"no": 22, "name": "游若蕓"}, {"no": 23, "name": "黃怡瑄"}, {"no": 24, "name": "黃語柔"}, {"no": 25, "name": "徐泳清"}], "102": [{"no": 1, "name": "王緯騰"}, {"no": 2, "name": "吳楨逸"}, {"no": 3, "name": "吳楨翔"}, {"no": 4, "name": "李國祥"}, {"no": 5, "name": "李晨陽"}, {"no": 6, "name": "林永順"}, {"no": 7, "name": "洪茂瑋"}, {"no": 8, "name": "洪晨鈞"}, {"no": 9, "name": "張泳紳"}, {"no": 10, "name": "劉宥呈"}, {"no": 11, "name": "蕭文傑"}, {"no": 12, "name": "賴昱維"}, {"no": 13, "name": "賴敬勛"}, {"no": 14, "name": "吳子瑜"}, {"no": 15, "name": "李欣蓉"}, {"no": 16, "name": "阮妮融"}, {"no": 17, "name": "林瑾薰"}, {"no": 18, "name": "張語恬"}, {"no": 19, "name": "郭敏芳"}, {"no": 20, "name": "曾婷錡"}, {"no": 21, "name": "黃宛榆"}, {"no": 22, "name": "黃婕恩"}, {"no": 23, "name": "鄭天慧"}, {"no": 24, "name": "蕭雅馨"}, {"no": 25, "name": "陳冠豪"}, {"no": 26, "name": "楊舒謠"}], "103": [{"no": 1, "name": "王俊雄"}, {"no": 2, "name": "李建廷"}, {"no": 3, "name": "林祐安"}, {"no": 4, "name": "林蔚澄"}, {"no": 5, "name": "邱峻宏"}, {"no": 6, "name": "馬詳閔"}, {"no": 7, "name": "莊鑫聖"}, {"no": 8, "name": "許勝溢"}, {"no": 9, "name": "陳勇男"}, {"no": 10, "name": "曾泓睿"}, {"no": 11, "name": "黃琨棋"}, {"no": 12, "name": "劉承勳"}, {"no": 13, "name": "蔡竺恩"}, {"no": 14, "name": "何語喬"}, {"no": 15, "name": "呂宇禎"}, {"no": 16, "name": "林郁雯"}, {"no": 17, "name": "張沛翎"}, {"no": 18, "name": "黃品璇"}, {"no": 19, "name": "黃湘晴"}, {"no": 20, "name": "楊佳翎"}, {"no": 21, "name": "劉沅芯"}, {"no": 22, "name": "蔡昀臻"}, {"no": 23, "name": "蕭翊涵"}, {"no": 24, "name": "謝惠如"}, {"no": 25, "name": "顏子薰"}, {"no": 26, "name": "邱譯賢"}], "104": [{"no": 1, "name": "王致凱"}, {"no": 2, "name": "江右璿"}, {"no": 3, "name": "吳文億"}, {"no": 4, "name": "吳亦捷"}, {"no": 5, "name": "吳翰昇"}, {"no": 6, "name": "李政恩"}, {"no": 7, "name": "邱逸修"}, {"no": 8, "name": "柯秉佑"}, {"no": 9, "name": "郭宗弦"}, {"no": 10, "name": "黃仲佑"}, {"no": 11, "name": "黃照傑"}, {"no": 12, "name": "鄭芳茂"}, {"no": 13, "name": "王韻甯"}, {"no": 14, "name": "何婕晨"}, {"no": 15, "name": "李沛緹"}, {"no": 16, "name": "李家瑜"}, {"no": 17, "name": "阮貞螢"}, {"no": 18, "name": "張沛晴"}, {"no": 19, "name": "張舒婷"}, {"no": 20, "name": "陳宥諪"}, {"no": 21, "name": "陳昱璇"}, {"no": 22, "name": "黄閔偲"}, {"no": 23, "name": "曾怡薰"}, {"no": 24, "name": "楊喬鈞"}, {"no": 25, "name": "徐霈璇"}], "105": [{"no": 1, "name": "林坤諺"}, {"no": 2, "name": "張又晟"}, {"no": 3, "name": "陳梓睿"}, {"no": 4, "name": "陳鈺翔"}, {"no": 5, "name": "黄子誠"}, {"no": 6, "name": "楊立安"}, {"no": 7, "name": "鄭煜融"}, {"no": 8, "name": "鄭煜嶧"}, {"no": 9, "name": "盧紳翰"}, {"no": 10, "name": "王于玲"}, {"no": 11, "name": "王婕瑜"}, {"no": 12, "name": "施欣瑜"}, {"no": 13, "name": "莊子欣"}, {"no": 14, "name": "陳沛涵"}, {"no": 15, "name": "陳佩真"}, {"no": 16, "name": "陳珈妤"}, {"no": 17, "name": "游紫晴"}, {"no": 18, "name": "楊懿琪"}, {"no": 19, "name": "蔡佳蓁"}, {"no": 20, "name": "簡恩多"}, {"no": 21, "name": "藍悻桐"}], "201": [{"no": 1, "name": "王進德"}, {"no": 2, "name": "江秉紘"}, {"no": 3, "name": "何書汎"}, {"no": 4, "name": "吳建昱"}, {"no": 5, "name": "李宇翔"}, {"no": 6, "name": "李東哲"}, {"no": 7, "name": "林正莚"}, {"no": 8, "name": "林宏勳"}, {"no": 9, "name": "林暄祐"}, {"no": 10, "name": "孫浩祥"}, {"no": 11, "name": "涂睿杰"}, {"no": 12, "name": "陳楷叡"}, {"no": 13, "name": "楊泓量"}, {"no": 14, "name": "楊秉鈞"}, {"no": 15, "name": "鄭博升"}, {"no": 16, "name": "蕭順騰"}, {"no": 17, "name": "簡于凱"}, {"no": 18, "name": "羅暐珵"}, {"no": 19, "name": "何浿羽"}, {"no": 20, "name": "林癸妙"}, {"no": 21, "name": "林禹馨"}, {"no": 22, "name": "邱方郁"}, {"no": 23, "name": "柯欣芸"}, {"no": 24, "name": "郭芯妤"}, {"no": 25, "name": "陳彥竹"}], "202": [{"no": 2, "name": "王鈞澤"}, {"no": 4, "name": "李凭潤"}, {"no": 5, "name": "李承翰"}, {"no": 6, "name": "徐祥睿"}, {"no": 8, "name": "張紘玹"}, {"no": 9, "name": "莊凱傑"}, {"no": 10, "name": "許允懷"}, {"no": 11, "name": "陳光炳"}, {"no": 12, "name": "黃秉豐"}, {"no": 13, "name": "劉光珈"}, {"no": 14, "name": "劉亮呈"}, {"no": 15, "name": "劉晏銘"}, {"no": 16, "name": "蔡昀叡"}, {"no": 17, "name": "賴政裕"}, {"no": 18, "name": "蘇耕玄"}, {"no": 19, "name": "吳竺容"}, {"no": 20, "name": "洪鑀娣"}, {"no": 21, "name": "涂羽岑"}, {"no": 22, "name": "陳怡均"}, {"no": 23, "name": "陳羿綾"}, {"no": 24, "name": "陸宣羽"}, {"no": 25, "name": "游緗翎"}, {"no": 26, "name": "張旨君"}, {"no": 27, "name": "余俊希"}], "203": [{"no": 1, "name": "江秉翊"}, {"no": 2, "name": "吳秉橙"}, {"no": 3, "name": "李泊瑾"}, {"no": 4, "name": "岳又承"}, {"no": 5, "name": "林宸光"}, {"no": 6, "name": "高嘉隆"}, {"no": 7, "name": "張東耀"}, {"no": 8, "name": "張庭魁"}, {"no": 9, "name": "許凱昕"}, {"no": 10, "name": "陳彥廷"}, {"no": 11, "name": "陳致誠"}, {"no": 12, "name": "黃致和"}, {"no": 13, "name": "黃澄宇"}, {"no": 14, "name": "劉昱瑋"}, {"no": 15, "name": "鄭峻東"}, {"no": 16, "name": "蕭佳委"}, {"no": 17, "name": "簡皇恩"}, {"no": 18, "name": "蘇稚凱"}, {"no": 19, "name": "林沛溱"}, {"no": 20, "name": "孫敏齡"}, {"no": 22, "name": "陳奕築"}, {"no": 23, "name": "羅幸蓁"}, {"no": 24, "name": "姜子涵"}], "204": [{"no": 1, "name": "何睿信"}, {"no": 2, "name": "陳柏翰"}, {"no": 3, "name": "黃明璿"}, {"no": 4, "name": "黃則善"}, {"no": 5, "name": "黃暐翰"}, {"no": 6, "name": "劉栢睿"}, {"no": 7, "name": "林芊惠"}, {"no": 8, "name": "段孟涵"}, {"no": 9, "name": "洪煜晴"}, {"no": 10, "name": "張育慈"}, {"no": 11, "name": "許令霏"}, {"no": 12, "name": "廖以晨"}, {"no": 13, "name": "劉晏妤"}], "301": [{"no": 1, "name": "何育騰"}, {"no": 2, "name": "何秉祐"}, {"no": 3, "name": "李彥諄"}, {"no": 4, "name": "許立哲"}, {"no": 5, "name": "陳冠文"}, {"no": 6, "name": "湯守正"}, {"no": 7, "name": "楊登程"}, {"no": 8, "name": "葉冠陞"}, {"no": 9, "name": "劉韋董"}, {"no": 10, "name": "盧建亨"}, {"no": 11, "name": "蘇煥元"}, {"no": 12, "name": "石家蓁"}, {"no": 13, "name": "吳玥妤"}, {"no": 14, "name": "吳姵萱"}, {"no": 15, "name": "李玉鳳"}, {"no": 16, "name": "李亞芸"}, {"no": 17, "name": "李美秀"}, {"no": 18, "name": "盧靜岑"}, {"no": 19, "name": "賴巧偵"}, {"no": 20, "name": "羅琪淋"}], "302": [{"no": 1, "name": "方柏淵"}, {"no": 3, "name": "施均諺"}, {"no": 4, "name": "張祐宇"}, {"no": 6, "name": "許詠彬"}, {"no": 7, "name": "陳威愷"}, {"no": 8, "name": "黃宏章"}, {"no": 9, "name": "黃翔"}, {"no": 10, "name": "劉一安"}, {"no": 11, "name": "賴辰昱"}, {"no": 12, "name": "方喻晴"}, {"no": 13, "name": "李思亭"}, {"no": 14, "name": "李美恩"}, {"no": 15, "name": "邱玟綺"}, {"no": 16, "name": "陳語晨"}, {"no": 17, "name": "廖以晴"}, {"no": 18, "name": "劉雨柔"}, {"no": 19, "name": "顏瑜筠"}, {"no": 20, "name": "龔家萱"}, {"no": 21, "name": "葉恩蓉"}, {"no": 23, "name": "周子甄"}], "303": [{"no": 1, "name": "何育駿"}, {"no": 2, "name": "何松澤"}, {"no": 3, "name": "吳承叡"}, {"no": 4, "name": "吳進和"}, {"no": 5, "name": "劉亞嶧"}, {"no": 6, "name": "蔡宗叡"}, {"no": 7, "name": "蔡玝緷"}, {"no": 8, "name": "蔡柏昱"}, {"no": 9, "name": "鍾富程"}, {"no": 10, "name": "顏崇凱"}, {"no": 12, "name": "李玉琪"}, {"no": 13, "name": "杜任婕"}, {"no": 14, "name": "林妍豫"}, {"no": 15, "name": "陳韋汝"}, {"no": 16, "name": "廖意菲"}, {"no": 17, "name": "蔡瑜嫙"}, {"no": 18, "name": "鄭湘蓉"}, {"no": 19, "name": "簡苡安"}, {"no": 21, "name": "江秉軒"}], "304": [{"no": 1, "name": "游智翔"}, {"no": 2, "name": "鄭秉恩"}, {"no": 3, "name": "李宗諺"}, {"no": 4, "name": "林祐任"}, {"no": 5, "name": "翁笠紘"}, {"no": 6, "name": "陳侑威"}, {"no": 7, "name": "陳冠綸"}, {"no": 9, "name": "戴聿呈"}, {"no": 10, "name": "蘇立元"}, {"no": 11, "name": "蘇聖博"}, {"no": 12, "name": "何丞瑜"}, {"no": 13, "name": "吳妍萱"}, {"no": 14, "name": "吳曼甄"}, {"no": 15, "name": "林韋臻"}, {"no": 16, "name": "柯捷苒"}, {"no": 17, "name": "張軒慈"}, {"no": 19, "name": "陳怡瑄"}, {"no": 20, "name": "曾苡瑄"}, {"no": 21, "name": "蔡姿嬪"}, {"no": 22, "name": "楊紫璿"}], "305": [{"no": 1, "name": "吳子勻"}, {"no": 2, "name": "翁梓宸"}, {"no": 3, "name": "許博鈞"}, {"no": 4, "name": "陳文書"}, {"no": 5, "name": "劉俊德"}, {"no": 6, "name": "劉宸均"}, {"no": 7, "name": "羅祥睿"}, {"no": 8, "name": "何亮靚"}, {"no": 9, "name": "何禹柔"}, {"no": 10, "name": "林真伃"}, {"no": 11, "name": "洪千雅"}, {"no": 13, "name": "洪新惠"}, {"no": 14, "name": "張書瑞"}, {"no": 15, "name": "陳詩涵"}, {"no": 16, "name": "黃宇慈"}, {"no": 17, "name": "黃品蓉"}, {"no": 18, "name": "黃宣晴"}, {"no": 19, "name": "黃翊雯"}, {"no": 20, "name": "楊芸榛"}, {"no": 21, "name": "楊懿筑"}, {"no": 22, "name": "蕭婉妤"}, {"no": 23, "name": "謝壹姍"}]};
 
-        // 3. 初始化日期與選單
+        // 3. Init Date & Class Dropdown
         const classSelect = document.getElementById('class-select');
+        const studentSelect = document.getElementById('student-select');
         const todayStr = new Date().toISOString().split('T')[0];
+        
         document.getElementById('date').value = todayStr;
         document.getElementById('admin-date-filter').value = todayStr;
 
-        // 生成班級選單 (依年級)
         function initClassDropdown() {
             classSelect.innerHTML = '<option value="" disabled selected>請選擇班級</option>';
-            const ranges = { 1: 5, 2: 4, 3: 5 }; // 各年級班級數
+            const ranges = { 1: 5, 2: 4, 3: 5 };
             for (let g = 1; g <= 3; g++) {
                 for (let c = 1; c <= ranges[g]; c++) {
-                    const val = `${g}${c.toString().padStart(2, '0')}`; // e.g., 101, 204
+                    const val = `${g}${c.toString().padStart(2, '0')}`;
                     const name = `${g}年${c}班`;
                     const opt = document.createElement('option');
                     opt.value = val;
@@ -229,105 +250,81 @@
         }
         initClassDropdown();
 
-        // 4. 老師選擇班級 -> 讀取內建名單
+        // 4. Update Student Dropdown
         function onClassChange() {
             const classCode = classSelect.value;
             if (!classCode) return;
-
-            const area = document.getElementById('student-selection-area');
-            area.innerHTML = '';
-
-            // 從 classData 讀取
+            
+            // Clear current students
+            studentSelect.innerHTML = '<option value="" disabled selected>請選擇學生</option>';
+            
             const students = classData[classCode];
-
-            if (students && students.length > 0) {
+            if (students) {
                 students.forEach(s => {
-                    const label = document.createElement('label');
-                    label.className = 'student-checkbox';
-                    label.innerHTML = `
-                        <input type="checkbox" value="${s.no}" data-name="${s.name}">
-                        <span><strong>${s.no}</strong> ${s.name}</span>
-                    `;
-                    // 點選變色效果
-                    label.querySelector('input').addEventListener('change', function() {
-                        if(this.checked) label.classList.add('checked');
-                        else label.classList.remove('checked');
-                    });
-                    area.appendChild(label);
+                    const opt = document.createElement('option');
+                    opt.value = s.no;
+                    opt.textContent = `${s.no}號 ${s.name}`;
+                    // Store name in dataset for easy retrieval
+                    opt.setAttribute('data-name', s.name);
+                    studentSelect.appendChild(opt);
                 });
-            } else {
-                area.innerHTML = '<p style="color:red; grid-column:1/-1; text-align:center; padding:10px;">查無此班級資料</p>';
             }
-
-            loadClassRecords(); // 載入今日請假狀況
+            loadTeacherRecords(); // Load history for teacher
         }
 
-        // 5. 送出資料 (寫入 Firestore)
+        // 5. Submit Single Student
         async function submitData() {
             const date = document.getElementById('date').value;
             const classCode = classSelect.value;
             const className = classSelect.options[classSelect.selectedIndex]?.text;
+            const seatNoVal = studentSelect.value;
             
-            if (!date || !classCode) { alert("請選擇日期與班級"); return; }
-            
-            const type = document.querySelector('input[name="leaveType"]:checked').value;
-            const checkboxes = document.querySelectorAll('#student-selection-area input:checked');
-            
-            if (checkboxes.length === 0) {
-                alert("請至少勾選一位學生");
+            if (!date || !classCode || !seatNoVal) {
+                alert("請完整填寫日期、班級與學生");
                 return;
             }
 
+            const selectedOpt = studentSelect.options[studentSelect.selectedIndex];
+            const name = selectedOpt.getAttribute('data-name');
+            const type = document.querySelector('input[name="leaveType"]:checked').value;
+            
             const btn = document.querySelector('button[onclick="submitData()"]');
             btn.disabled = true;
-            btn.textContent = "資料儲存中...";
+            btn.textContent = "儲存中...";
 
-            const batch = db.batch();
-            let count = 0;
-
-            checkboxes.forEach(chk => {
-                const seatNo = parseInt(chk.value);
-                const name = chk.getAttribute('data-name');
-                const docRef = db.collection("attendance").doc(); 
-                
-                batch.set(docRef, {
+            try {
+                await db.collection("attendance").add({
                     date: date,
                     classCode: parseInt(classCode),
                     className: className,
-                    seatNo: seatNo,
+                    seatNo: parseInt(seatNoVal),
                     name: name,
                     type: type,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
-                count++;
-            });
-
-            try {
-                await batch.commit();
-                showToast(`成功登記 ${count} 位學生！`);
-                // 清除勾選狀態
-                checkboxes.forEach(c => {
-                    c.checked = false;
-                    c.parentElement.classList.remove('checked');
-                });
-                loadClassRecords(); 
+                
+                showToast(`成功新增：${seatNoVal}號 ${name} (${type})`);
+                
+                // Reset student select but keep class and date
+                studentSelect.value = "";
+                
             } catch (e) {
-                alert("儲存失敗，請檢查網路");
+                alert("儲存失敗");
                 console.error(e);
             } finally {
                 btn.disabled = false;
-                btn.textContent = "送出資料";
+                btn.textContent = "新增一筆資料";
             }
         }
 
-        // 6. 顯示今日該班已請假名單 (Teacher View)
+        // 6. Teacher View: Realtime List
         let teacherUnsub;
-        function loadClassRecords() {
+        function loadTeacherRecords() {
             const date = document.getElementById('date').value;
             const classCode = classSelect.value;
             if(!classCode) return;
 
-            document.getElementById('current-class-name').textContent = classSelect.options[classSelect.selectedIndex].text;
+            document.getElementById('current-class-display').textContent = `(${classSelect.options[classSelect.selectedIndex].text})`;
             const container = document.getElementById('teacher-records-container');
 
             if(teacherUnsub) teacherUnsub();
@@ -335,30 +332,27 @@
             teacherUnsub = db.collection("attendance")
                 .where("date", "==", date)
                 .where("classCode", "==", parseInt(classCode))
+                .orderBy("timestamp", "desc") // Show latest first
                 .onSnapshot(snap => {
                     const list = [];
                     snap.forEach(d => list.push(d.data()));
-                    list.sort((a,b) => a.seatNo - b.seatNo);
                     
-                    if (list.length === 0) {
-                        container.innerHTML = '<p style="color:#999; text-align:center;">目前無人請假</p>';
-                    } else {
-                        container.innerHTML = '';
-                        list.forEach(d => {
-                            const div = document.createElement('div');
-                            div.className = `record-item ${d.type}`;
-                            div.innerHTML = `
-                                <span><strong>${d.seatNo}號</strong> ${d.name}</span>
-                                <span class="tag ${d.type}">${d.type}</span>
-                            `;
-                            container.appendChild(div);
-                        });
-                    }
+                    container.innerHTML = list.length ? '' : '<p style="color:#999; text-align:center;">目前無資料</p>';
+                    
+                    list.forEach(d => {
+                        const div = document.createElement('div');
+                        div.className = `record-item ${d.type}`;
+                        div.innerHTML = `
+                            <span><strong>${d.seatNo}號</strong> ${d.name}</span>
+                            <span class="tag ${d.type}">${d.type}</span>
+                        `;
+                        container.appendChild(div);
+                    });
                 });
         }
-        document.getElementById('date').addEventListener('change', loadClassRecords);
+        document.getElementById('date').addEventListener('change', loadTeacherRecords);
 
-        // 7. 後台管理
+        // 7. Admin Functions (Edit & Delete)
         function toggleAdminView() {
             const el = document.getElementById('admin-section');
             el.style.display = el.style.display === 'none' ? 'block' : 'none';
@@ -379,7 +373,7 @@
             if(adminUnsub) adminUnsub();
         }
 
-        // 後台監聽
+        // Admin Viewer + Actions
         let adminUnsub;
         function startAdminListener() {
             const date = document.getElementById('admin-date-filter').value;
@@ -389,8 +383,11 @@
             adminUnsub = db.collection("attendance").where("date", "==", date)
                 .onSnapshot(snap => {
                     const list = [];
-                    snap.forEach(d => list.push(d.data()));
-                    // 排序：班級 -> 座號
+                    snap.forEach(doc => {
+                        list.push({ id: doc.id, ...doc.data() });
+                    });
+                    
+                    // Sort: Class -> Seat
                     list.sort((a,b) => (a.classCode - b.classCode) || (a.seatNo - b.seatNo));
                     
                     container.innerHTML = list.length ? '' : '<p style="text-align:center;color:#999;padding:20px;">本日尚無資料</p>';
@@ -401,15 +398,45 @@
                             container.innerHTML += `<div style="background:#eee; padding:8px; margin:15px 0 5px; font-weight:bold; border-radius:4px;">${d.className}</div>`;
                             lastClass = d.classCode;
                         }
-                        container.innerHTML += `
-                            <div class="record-item ${d.type}">
+                        
+                        const div = document.createElement('div');
+                        div.className = `record-item ${d.type}`;
+                        div.innerHTML = `
+                            <div>
                                 <span>${d.seatNo}號 ${d.name}</span>
                                 <span class="tag ${d.type}">${d.type}</span>
-                            </div>`;
+                            </div>
+                            <div class="admin-actions">
+                                <button class="btn-edit" onclick="editRecord('${d.id}', '${d.name}', '${d.type}')">修改</button>
+                                <button class="btn-delete" onclick="deleteRecord('${d.id}', '${d.name}')">刪除</button>
+                            </div>
+                        `;
+                        container.appendChild(div);
                     });
                 });
         }
         document.getElementById('admin-date-filter').addEventListener('change', startAdminListener);
+
+        // Delete Logic
+        function deleteRecord(id, name) {
+            if(confirm(`確定要刪除「${name}」的紀錄嗎？`)) {
+                db.collection("attendance").doc(id).delete()
+                    .then(() => showToast("已刪除"))
+                    .catch(e => alert("刪除失敗"));
+            }
+        }
+
+        // Edit Logic
+        function editRecord(id, name, currentType) {
+            const newType = prompt(`請輸入「${name}」的新假別 (病假/事假/其他)：`, currentType);
+            if(newType && ['病假','事假','其他'].includes(newType)) {
+                db.collection("attendance").doc(id).update({ type: newType })
+                    .then(() => showToast("修改成功"))
+                    .catch(e => alert("修改失敗"));
+            } else if (newType) {
+                alert("請輸入正確的假別：病假、事假 或 其他");
+            }
+        }
 
         function showToast(msg) {
             const x = document.getElementById("toast");
