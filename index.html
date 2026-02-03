@@ -13,6 +13,7 @@
             --primary-color: #4CAF50;
             --bg-color: #f4f7f6;
             --text-color: #333;
+            --border-radius: 8px;
         }
 
         body {
@@ -24,158 +25,94 @@
         }
 
         .container {
-            max-width: 600px;
+            max-width: 700px;
             margin: 0 auto;
             background: white;
             padding: 30px;
-            border-radius: 10px;
+            border-radius: var(--border-radius);
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
 
-        h1, h2 {
-            text-align: center;
-            color: #2c3e50;
-        }
+        h1, h2, h3 { text-align: center; color: #2c3e50; }
 
-        .form-group {
-            margin-bottom: 20px;
-        }
+        .form-group { margin-bottom: 20px; }
 
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-        }
+        label { display: block; margin-bottom: 8px; font-weight: bold; }
 
-        input[type="date"],
-        input[type="number"],
-        select {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 16px;
-            box-sizing: border-box; /* Fix padding issue */
-        }
-
-        .radio-group {
-            display: flex;
-            gap: 15px;
-            margin-top: 5px;
-        }
-
-        .radio-group label {
-            font-weight: normal;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-        }
-
-        .radio-group input {
-            margin-right: 5px;
+        input, select {
+            width: 100%; padding: 12px; border: 1px solid #ddd;
+            border-radius: 6px; font-size: 16px; box-sizing: border-box;
         }
 
         button {
-            width: 100%;
+            width: 100%; padding: 15px; background-color: var(--primary-color);
+            color: white; border: none; border-radius: 6px; font-size: 18px;
+            cursor: pointer; transition: background 0.3s;
+        }
+        button:hover { background-color: #45a049; }
+        button:disabled { background-color: #ccc; cursor: not-allowed; }
+
+        /* Student Selection Grid */
+        #student-selection-area {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
             padding: 15px;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
+            background: #f9f9f9;
+            border: 1px solid #eee;
             border-radius: 6px;
-            font-size: 18px;
-            cursor: pointer;
-            transition: background 0.3s;
+            max-height: 300px;
+            overflow-y: auto;
         }
 
-        button:hover {
-            background-color: #45a049;
-        }
-
-        /* Admin Section Styling */
-        #admin-section {
-            display: none; /* Hidden by default */
-            margin-top: 40px;
-            border-top: 2px dashed #ccc;
-            padding-top: 20px;
-        }
-
-        .admin-login-trigger {
-            text-align: center;
-            margin-top: 50px;
-            font-size: 12px;
-            color: #ccc;
-        }
-
-        .admin-login-trigger a {
-            color: #ccc;
-            text-decoration: none;
-            cursor: pointer;
-        }
-        
-        .admin-login-trigger a:hover {
-            color: #999;
-        }
-
-        .record-card {
-            background: #fff;
-            border-left: 5px solid var(--primary-color);
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 4px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        .student-checkbox {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-        }
-
-        .class-header {
-            background-color: #e9ecef;
-            padding: 10px;
-            margin-top: 20px;
-            border-radius: 5px;
-            font-weight: bold;
-            color: #555;
-        }
-
-        .tag {
-            padding: 4px 8px;
+            padding: 8px;
+            background: white;
+            border: 1px solid #ddd;
             border-radius: 4px;
-            font-size: 14px;
-            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
         }
+
+        .student-checkbox:hover { background-color: #e8f5e9; border-color: var(--primary-color); }
+        .student-checkbox input { width: auto; margin-right: 8px; }
+        .student-checkbox.checked { background-color: #e8f5e9; border-color: var(--primary-color); font-weight: bold; }
+
+        /* Radio Group */
+        .radio-group { display: flex; gap: 15px; margin-top: 5px; }
+        .radio-group label { font-weight: normal; cursor: pointer; display: flex; align-items: center; }
+        .radio-group input { margin-right: 5px; width: auto; }
+
+        /* Admin & Lists */
+        .list-container { margin-top: 20px; border-top: 1px solid #eee; padding-top: 10px; }
+        .record-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px; background: #f9f9f9; border-radius: 4px; margin-bottom: 5px;
+            border-left: 4px solid #ddd;
+        }
+        .record-item.病假 { border-left-color: #e74c3c; }
+        .record-item.事假 { border-left-color: #f39c12; }
+        .record-item.其他 { border-left-color: #3498db; }
+        .tag { padding: 2px 6px; border-radius: 4px; font-size: 12px; color: white; }
         .tag.病假 { background-color: #e74c3c; }
         .tag.事假 { background-color: #f39c12; }
         .tag.其他 { background-color: #3498db; }
 
+        #admin-section { display: none; margin-top: 40px; border-top: 2px dashed #ccc; padding-top: 20px; }
+        .admin-login-trigger { text-align: center; margin-top: 50px; font-size: 12px; color: #ccc; }
+        .admin-login-trigger a { cursor: pointer; text-decoration: none; color: #ccc; }
+        
         #toast {
-            visibility: hidden;
-            min-width: 250px;
-            background-color: #333;
-            color: #fff;
-            text-align: center;
-            border-radius: 2px;
-            padding: 16px;
-            position: fixed;
-            z-index: 1;
-            left: 50%;
-            bottom: 30px;
-            transform: translateX(-50%);
+            visibility: hidden; min-width: 250px; background-color: #333; color: #fff;
+            text-align: center; border-radius: 2px; padding: 16px; position: fixed;
+            z-index: 999; left: 50%; bottom: 30px; transform: translateX(-50%);
         }
-
-        #toast.show {
-            visibility: visible;
-            animation: fadein 0.5s, fadeout 0.5s 2.5s;
-        }
-
-        @keyframes fadein {
-            from {bottom: 0; opacity: 0;}
-            to {bottom: 30px; opacity: 1;}
-        }
-
-        @keyframes fadeout {
-            from {bottom: 30px; opacity: 1;}
-            to {bottom: 0; opacity: 0;}
-        }
+        #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
+        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
+        @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
     </style>
 </head>
 <body>
@@ -191,14 +128,17 @@
 
             <div class="form-group">
                 <label for="class-select">班級</label>
-                <select id="class-select">
+                <select id="class-select" onchange="onClassChange()">
                     <option value="" disabled selected>請選擇班級</option>
                     </select>
             </div>
 
             <div class="form-group">
-                <label for="seat-no">座號</label>
-                <input type="number" id="seat-no" placeholder="請輸入座號 (數字)" min="1" max="50">
+                <label>選擇請假學生</label>
+                <div id="student-loading" style="display:none; color: #666;">載入學生名單中...</div>
+                <div id="student-selection-area">
+                    <p style="color: #999; grid-column: 1/-1; text-align: center;">請先選擇班級</p>
+                </div>
             </div>
 
             <div class="form-group">
@@ -211,6 +151,11 @@
             </div>
 
             <button onclick="submitData()">送出資料</button>
+
+            <div class="list-container" id="teacher-list-area" style="display:none;">
+                <div class="list-title">📋 <span id="current-class-name"></span> 今日已登錄名單：</div>
+                <div id="teacher-records-container"></div>
+            </div>
         </div>
 
         <div id="admin-section">
@@ -225,28 +170,31 @@
 
             <div id="data-panel" style="display: none;">
                 <div style="margin-bottom: 15px; text-align: right;">
-                    <button onclick="logout()" style="width: auto; padding: 5px 15px; font-size: 14px; background-color: #999;">登出</button>
+                    <button onclick="logout()" style="width: auto; padding: 5px 15px; background-color: #999;">登出</button>
                 </div>
+
+                <div style="background: #eef2f5; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <h3 style="margin-top:0;">匯入學生名單 (CSV)</h3>
+                    <p style="font-size: 14px; color: #666;">請選取所有班級的 CSV 檔案 (如：114班級名條...101.csv)</p>
+                    <input type="file" id="csv-files" multiple accept=".csv" style="background: white;">
+                    <button onclick="processFiles()" style="margin-top: 10px; background-color: #008CBA;">開始匯入</button>
+                    <div id="import-log" style="margin-top: 10px; font-size: 12px; color: #333; max-height: 100px; overflow-y: auto;"></div>
+                </div>
+
                 <div class="form-group">
-                    <label>篩選日期 (後台檢視用)</label>
+                    <label>檢視請假紀錄 (依日期)</label>
                     <input type="date" id="admin-date-filter">
                 </div>
-                <div id="records-container">
-                    <p style="text-align: center; color: #999;">載入中...</p>
-                </div>
+                <div id="records-container"></div>
             </div>
         </div>
-
     </div>
 
-    <div class="admin-login-trigger">
-        <a onclick="toggleAdminView()">Admin Login</a>
-    </div>
-
-    <div id="toast">資料已成功儲存！</div>
+    <div class="admin-login-trigger"><a onclick="toggleAdminView()">Admin Login</a></div>
+    <div id="toast"></div>
 
     <script>
-        // 1. Firebase Configuration
+        // 1. Firebase Init
         const firebaseConfig = {
             apiKey: "AIzaSyAeD-SR6_4uhGB1JH5PChkTPqyyNlNZpFY",
             authDomain: "leave-c84f8.firebaseapp.com",
@@ -256,180 +204,283 @@
             appId: "1:875704438036:web:e4ff18be5dd41f80828601",
             measurementId: "G-DJ4538SQP8"
         };
-
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // 2. Class List Generation Logic
-        const classRanges = {
-            1: 5, // 一年級 1-5 班
-            2: 4, // 二年級 1-4 班
-            3: 5  // 三年級 1-5 班
-        };
-
+        // 2. Class Dropdown Init
         const classSelect = document.getElementById('class-select');
-        const classList = []; // For sorting later
-
         function initClassDropdown() {
-            for (let grade = 1; grade <= 3; grade++) {
-                const maxClass = classRanges[grade];
-                for (let cls = 1; cls <= maxClass; cls++) {
-                    const classValue = `${grade}${cls.toString().padStart(2, '0')}`; // e.g., 101, 204
-                    const className = `${grade}年${cls}班`;
-                    
-                    const option = document.createElement('option');
-                    option.value = classValue;
-                    option.textContent = className;
-                    classSelect.appendChild(option);
-                    
-                    classList.push({ code: parseInt(classValue), name: className });
+            classSelect.innerHTML = '<option value="" disabled selected>請選擇班級</option>';
+            const ranges = { 1: 5, 2: 4, 3: 5 };
+            for (let g = 1; g <= 3; g++) {
+                for (let c = 1; c <= ranges[g]; c++) {
+                    const val = `${g}${c.toString().padStart(2, '0')}`;
+                    const opt = document.createElement('option');
+                    opt.value = val;
+                    opt.textContent = `${g}年${c}班`;
+                    classSelect.appendChild(opt);
                 }
             }
         }
-
-        // 3. Date Initialization (Today as default)
-        const dateInput = document.getElementById('date');
-        const adminDateInput = document.getElementById('admin-date-filter');
-        const todayStr = new Date().toISOString().split('T')[0];
-        
-        dateInput.value = todayStr;
-        dateInput.min = todayStr; // Prevent past dates
-        adminDateInput.value = todayStr;
-
         initClassDropdown();
 
-        // 4. Submit Data Function
-        function submitData() {
-            const date = dateInput.value;
-            const classCode = document.getElementById('class-select').value;
-            const className = document.getElementById('class-select').selectedOptions[0]?.text;
-            const seatNo = document.getElementById('seat-no').value;
-            const type = document.querySelector('input[name="leaveType"]:checked').value;
+        // Dates
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('date').value = today;
+        document.getElementById('admin-date-filter').value = today;
 
-            if (!date || !classCode || !seatNo) {
-                alert("請填寫所有欄位");
+        // 3. Teacher UI: Load Students
+        async function onClassChange() {
+            const classCode = classSelect.value;
+            if (!classCode) return;
+
+            const area = document.getElementById('student-selection-area');
+            const loading = document.getElementById('student-loading');
+            
+            area.innerHTML = '';
+            loading.style.display = 'block';
+
+            try {
+                // Fetch student list from Firestore 'classes' collection
+                const doc = await db.collection('classes').doc(classCode).get();
+                loading.style.display = 'none';
+
+                if (doc.exists && doc.data().students && doc.data().students.length > 0) {
+                    const students = doc.data().students;
+                    // Sort by seat no just in case
+                    students.sort((a, b) => a.no - b.no);
+
+                    students.forEach(s => {
+                        const label = document.createElement('label');
+                        label.className = 'student-checkbox';
+                        label.innerHTML = `
+                            <input type="checkbox" value="${s.no}" data-name="${s.name}">
+                            <span>${s.no.toString().padStart(2,'0')} ${s.name}</span>
+                        `;
+                        // Toggle visual style
+                        label.querySelector('input').addEventListener('change', function() {
+                            if(this.checked) label.classList.add('checked');
+                            else label.classList.remove('checked');
+                        });
+                        area.appendChild(label);
+                    });
+                } else {
+                    area.innerHTML = '<p style="color:red; grid-column:1/-1; text-align:center;">此班級尚無學生名單，請聯絡管理員匯入。</p>';
+                }
+            } catch (e) {
+                console.error(e);
+                loading.style.display = 'none';
+                area.innerHTML = '<p style="color:red;">讀取失敗，請檢查網路。</p>';
+            }
+
+            loadClassRecords(); // Load existing records for today
+        }
+
+        // 4. Submit Data
+        async function submitData() {
+            const date = document.getElementById('date').value;
+            const classCode = classSelect.value;
+            const className = classSelect.options[classSelect.selectedIndex]?.text;
+            const type = document.querySelector('input[name="leaveType"]:checked').value;
+            
+            // Get selected students
+            const checkboxes = document.querySelectorAll('#student-selection-area input:checked');
+            if (checkboxes.length === 0) {
+                alert("請至少選擇一位學生");
                 return;
             }
 
-            const btn = document.querySelector('#teacher-form button');
+            const btn = document.querySelector('button[onclick="submitData()"]');
             btn.disabled = true;
             btn.textContent = "儲存中...";
 
-            db.collection("attendance").add({
-                date: date,
-                classCode: parseInt(classCode), // For sorting
-                className: className,
-                seatNo: parseInt(seatNo),
-                type: type,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            })
-            .then(() => {
-                showToast();
-                // Reset minimal fields
-                document.getElementById('seat-no').value = '';
-                btn.disabled = false;
-                btn.textContent = "送出資料";
-            })
-            .catch((error) => {
-                console.error("Error adding document: ", error);
-                alert("儲存失敗，請檢查網路");
-                btn.disabled = false;
-                btn.textContent = "送出資料";
+            const batch = db.batch();
+            let count = 0;
+
+            checkboxes.forEach(chk => {
+                const seatNo = parseInt(chk.value);
+                const name = chk.getAttribute('data-name');
+                const docRef = db.collection("attendance").doc();
+                batch.set(docRef, {
+                    date, classCode: parseInt(classCode), className,
+                    seatNo, name, type, // Added Name to record
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                count++;
             });
-        }
 
-        // 5. Toast Notification
-        function showToast() {
-            const x = document.getElementById("toast");
-            x.className = "show";
-            setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
-        }
-
-        // 6. Admin Functions
-        function toggleAdminView() {
-            const adminSection = document.getElementById('admin-section');
-            if (adminSection.style.display === 'block') {
-                adminSection.style.display = 'none';
-            } else {
-                adminSection.style.display = 'block';
-                document.getElementById('admin-section').scrollIntoView({behavior: "smooth"});
+            try {
+                await batch.commit();
+                showToast(`成功新增 ${count} 位學生`);
+                // Uncheck all
+                checkboxes.forEach(c => {
+                    c.checked = false;
+                    c.parentElement.classList.remove('checked');
+                });
+                loadClassRecords();
+            } catch (e) {
+                alert("儲存失敗");
+                console.error(e);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = "送出資料";
             }
         }
 
-        function checkLogin() {
-            const pwd = document.getElementById('admin-pwd').value;
-            if (pwd === '1234') {
-                document.getElementById('login-panel').style.display = 'none';
-                document.getElementById('data-panel').style.display = 'block';
-                startRealtimeListener();
-            } else {
-                alert("密碼錯誤");
-            }
-        }
-        
-        function logout() {
-            document.getElementById('login-panel').style.display = 'block';
-            document.getElementById('data-panel').style.display = 'none';
-            document.getElementById('admin-pwd').value = '';
-            if(unsubscribe) unsubscribe(); // Stop listening
-        }
+        // 5. Load Records (Teacher View)
+        let teacherUnsub;
+        function loadClassRecords() {
+            const date = document.getElementById('date').value;
+            const classCode = classSelect.value;
+            if(!classCode) return;
 
-        let unsubscribe;
+            if(teacherUnsub) teacherUnsub();
+            const container = document.getElementById('teacher-records-container');
+            document.getElementById('teacher-list-area').style.display = 'block';
+            document.getElementById('current-class-name').textContent = classSelect.options[classSelect.selectedIndex].text;
 
-        function startRealtimeListener() {
-            const filterDate = document.getElementById('admin-date-filter').value;
-            const container = document.getElementById('records-container');
-            
-            // Listen to Firestore changes
-            unsubscribe = db.collection("attendance")
-                .where("date", "==", filterDate)
-                .orderBy("classCode") // Sort by class (101 -> 305)
-                .orderBy("seatNo")
-                .onSnapshot((querySnapshot) => {
-                    container.innerHTML = "";
+            teacherUnsub = db.collection("attendance")
+                .where("date", "==", date)
+                .where("classCode", "==", parseInt(classCode))
+                .onSnapshot(snap => {
+                    const list = [];
+                    snap.forEach(d => list.push(d.data()));
+                    list.sort((a,b) => a.seatNo - b.seatNo);
                     
-                    if (querySnapshot.empty) {
-                        container.innerHTML = "<p style='text-align:center;'>本日目前無請假資料。</p>";
-                        return;
-                    }
-
-                    let currentClassCode = null;
-
-                    querySnapshot.forEach((doc) => {
-                        const data = doc.data();
-                        
-                        // Create Header if new class block
-                        if (data.classCode !== currentClassCode) {
-                            const header = document.createElement('div');
-                            header.className = 'class-header';
-                            header.textContent = data.className;
-                            container.appendChild(header);
-                            currentClassCode = data.classCode;
-                        }
-
-                        // Create Record Card
-                        const card = document.createElement('div');
-                        card.className = 'record-card';
-                        card.innerHTML = `
-                            <div>
-                                <strong>${data.seatNo} 號</strong>
-                            </div>
-                            <span class="tag ${data.type}">${data.type}</span>
-                        `;
-                        container.appendChild(card);
+                    container.innerHTML = list.length ? '' : '<p style="color:#999;">目前無資料</p>';
+                    list.forEach(d => {
+                        const div = document.createElement('div');
+                        div.className = `record-item ${d.type}`;
+                        // Display Name if available, else just Seat
+                        const display = d.name ? `${d.seatNo}號 ${d.name}` : `${d.seatNo}號`;
+                        div.innerHTML = `<strong>${display}</strong> <span class="tag ${d.type}">${d.type}</span>`;
+                        container.appendChild(div);
                     });
                 });
         }
 
-        // Update admin view when date filter changes
-        adminDateInput.addEventListener('change', () => {
-             if (document.getElementById('data-panel').style.display === 'block') {
-                 if(unsubscribe) unsubscribe();
-                 startRealtimeListener();
-             }
-        });
+        // 6. Admin Logic & Import
+        function toggleAdminView() {
+            const el = document.getElementById('admin-section');
+            el.style.display = el.style.display === 'none' ? 'block' : 'none';
+            if(el.style.display === 'block') el.scrollIntoView({behavior:'smooth'});
+        }
+        function checkLogin() {
+            if(document.getElementById('admin-pwd').value === '1234') {
+                document.getElementById('login-panel').style.display = 'none';
+                document.getElementById('data-panel').style.display = 'block';
+                startAdminListener();
+            } else alert('密碼錯誤');
+        }
+        function logout() {
+            document.getElementById('login-panel').style.display = 'block';
+            document.getElementById('data-panel').style.display = 'none';
+        }
 
+        // CSV Import Function
+        async function processFiles() {
+            const files = document.getElementById('csv-files').files;
+            if(files.length === 0) { alert("請先選擇檔案"); return; }
+
+            const log = document.getElementById('import-log');
+            log.innerHTML = "開始處理...<br>";
+
+            for(let i=0; i<files.length; i++) {
+                const file = files[i];
+                // Try to extract class code from filename (e.g. "... - 101.csv")
+                const match = file.name.match(/[-_ ](\d{3})\.csv$/);
+                if(!match) {
+                    log.innerHTML += `<span style="color:red">跳過: ${file.name} (無法辨識班級代號，檔名需包含如 ' - 101.csv')</span><br>`;
+                    continue;
+                }
+                const classCode = match[1]; // "101"
+
+                const text = await file.text();
+                const students = parseCSV(text);
+                
+                if(students.length > 0) {
+                    // Upload to Firebase
+                    await db.collection('classes').doc(classCode).set({
+                        students: students,
+                        lastUpdate: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    log.innerHTML += `<span style="color:green">成功: ${classCode}班 (共 ${students.length} 人)</span><br>`;
+                } else {
+                    log.innerHTML += `<span style="color:orange">警告: ${classCode}班 讀取不到學生資料</span><br>`;
+                }
+            }
+            log.innerHTML += "<strong>全部處理完成！</strong>";
+        }
+
+        function parseCSV(text) {
+            const lines = text.split(/\r\n|\n/);
+            const students = [];
+            
+            // Logic: Scan every line. If a line starts with a number (seat) and has a name next to it.
+            // CSV Format based on user file: Repeated columns.
+            // We just iterate all columns in a row looking for pair (Number, String).
+            
+            lines.forEach(line => {
+                const parts = line.split(',');
+                // Loop through pairs: (0,1), (2,3), (4,5)... 
+                // Because the file repeats the list horizontally
+                for (let i = 0; i < parts.length - 1; i += 2) { // Step 2 (assuming seat, name, empty, empty...)
+                    // Actually snippet shows: 1.0, Name, empty, empty, 1.0, Name...
+                    // So we check index i and i+1
+                    const seatStr = parts[i].trim();
+                    const nameStr = parts[i+1]?.trim();
+
+                    // Check if seatStr is a valid number (e.g., "1.0", "25")
+                    // Filter out "114.0" (Year) -> assuming class size < 60
+                    const seatNum = parseFloat(seatStr);
+                    
+                    if (!isNaN(seatNum) && seatNum > 0 && seatNum < 60 && nameStr) {
+                        // Check duplicates
+                        if (!students.find(s => s.no === seatNum)) {
+                            students.push({ no: seatNum, name: nameStr });
+                        }
+                    }
+                }
+            });
+            return students.sort((a,b) => a.no - b.no);
+        }
+
+        // Admin Viewer
+        let adminUnsub;
+        function startAdminListener() {
+            if(adminUnsub) adminUnsub();
+            const date = document.getElementById('admin-date-filter').value;
+            const container = document.getElementById('records-container');
+            
+            adminUnsub = db.collection("attendance").where("date", "==", date)
+                .onSnapshot(snap => {
+                    let list = [];
+                    snap.forEach(d => list.push(d.data()));
+                    // Sort by Class then Seat
+                    list.sort((a,b) => (a.classCode - b.classCode) || (a.seatNo - b.seatNo));
+                    
+                    container.innerHTML = list.length ? '' : '<p style="text-align:center;color:#999;">本日無資料</p>';
+                    let curClass = null;
+                    list.forEach(d => {
+                        if(d.classCode !== curClass) {
+                            container.innerHTML += `<div style="background:#eee;padding:5px;margin:10px 0;font-weight:bold;">${d.className}</div>`;
+                            curClass = d.classCode;
+                        }
+                        container.innerHTML += `
+                            <div class="record-item ${d.type}" style="background:white;">
+                                <span>${d.seatNo}號 ${d.name || ''}</span>
+                                <span class="tag ${d.type}">${d.type}</span>
+                            </div>`;
+                    });
+                });
+        }
+        document.getElementById('admin-date-filter').addEventListener('change', startAdminListener);
+
+        function showToast(msg) {
+            const x = document.getElementById("toast");
+            x.textContent = msg; x.className = "show";
+            setTimeout(()=>x.className=x.className.replace("show",""), 3000);
+        }
     </script>
 </body>
 </html>
