@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大吉國中 - 學生出缺席管理系統</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --bg-color: #f4f7f6;
+            --text-color: #333;
+        }
+
+        body {
+            font-family: "Microsoft JhengHei", Arial, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+            color: var(--text-color);
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #2c3e50;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        input[type="date"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            box-sizing: border-box; /* Fix padding issue */
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 5px;
+        }
+
+        .radio-group label {
+            font-weight: normal;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .radio-group input {
+            margin-right: 5px;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        /* Admin Section Styling */
+        #admin-section {
+            display: none; /* Hidden by default */
+            margin-top: 40px;
+            border-top: 2px dashed #ccc;
+            padding-top: 20px;
+        }
+
+        .admin-login-trigger {
+            text-align: center;
+            margin-top: 50px;
+            font-size: 12px;
+            color: #ccc;
+        }
+
+        .admin-login-trigger a {
+            color: #ccc;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        
+        .admin-login-trigger a:hover {
+            color: #999;
+        }
+
+        .record-card {
+            background: #fff;
+            border-left: 5px solid var(--primary-color);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .class-header {
+            background-color: #e9ecef;
+            padding: 10px;
+            margin-top: 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .tag {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 14px;
+            color: white;
+        }
+        .tag.病假 { background-color: #e74c3c; }
+        .tag.事假 { background-color: #f39c12; }
+        .tag.其他 { background-color: #3498db; }
+
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 2px;
+            padding: 16px;
+            position: fixed;
+            z-index: 1;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+        }
+
+        #toast.show {
+            visibility: visible;
+            animation: fadein 0.5s, fadeout 0.5s 2.5s;
+        }
+
+        @keyframes fadein {
+            from {bottom: 0; opacity: 0;}
+            to {bottom: 30px; opacity: 1;}
+        }
+
+        @keyframes fadeout {
+            from {bottom: 30px; opacity: 1;}
+            to {bottom: 0; opacity: 0;}
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>大吉國中<br><span style="font-size: 0.8em; color: #666;">學生出缺席回報</span></h1>
+        
+        <div id="teacher-form">
+            <div class="form-group">
+                <label for="date">日期</label>
+                <input type="date" id="date">
+            </div>
+
+            <div class="form-group">
+                <label for="class-select">班級</label>
+                <select id="class-select">
+                    <option value="" disabled selected>請選擇班級</option>
+                    </select>
+            </div>
+
+            <div class="form-group">
+                <label for="seat-no">座號</label>
+                <input type="number" id="seat-no" placeholder="請輸入座號 (數字)" min="1" max="50">
+            </div>
+
+            <div class="form-group">
+                <label>請假類別</label>
+                <div class="radio-group">
+                    <label><input type="radio" name="leaveType" value="病假" checked> 病假</label>
+                    <label><input type="radio" name="leaveType" value="事假"> 事假</label>
+                    <label><input type="radio" name="leaveType" value="其他"> 其他</label>
+                </div>
+            </div>
+
+            <button onclick="submitData()">送出資料</button>
+        </div>
+
+        <div id="admin-section">
+            <h2>後台管理系統</h2>
+            <div id="login-panel">
+                <div class="form-group">
+                    <label>管理員密碼</label>
+                    <input type="password" id="admin-pwd" placeholder="輸入密碼">
+                </div>
+                <button onclick="checkLogin()" style="background-color: #607d8b;">登入</button>
+            </div>
+
+            <div id="data-panel" style="display: none;">
+                <div style="margin-bottom: 15px; text-align: right;">
+                    <button onclick="logout()" style="width: auto; padding: 5px 15px; font-size: 14px; background-color: #999;">登出</button>
+                </div>
+                <div class="form-group">
+                    <label>篩選日期 (後台檢視用)</label>
+                    <input type="date" id="admin-date-filter">
+                </div>
+                <div id="records-container">
+                    <p style="text-align: center; color: #999;">載入中...</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="admin-login-trigger">
+        <a onclick="toggleAdminView()">Admin Login</a>
+    </div>
+
+    <div id="toast">資料已成功儲存！</div>
+
+    <script>
+        // 1. Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAeD-SR6_4uhGB1JH5PChkTPqyyNlNZpFY",
+            authDomain: "leave-c84f8.firebaseapp.com",
+            projectId: "leave-c84f8",
+            storageBucket: "leave-c84f8.firebasestorage.app",
+            messagingSenderId: "875704438036",
+            appId: "1:875704438036:web:e4ff18be5dd41f80828601",
+            measurementId: "G-DJ4538SQP8"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // 2. Class List Generation Logic
+        const classRanges = {
+            1: 5, // 一年級 1-5 班
+            2: 4, // 二年級 1-4 班
+            3: 5  // 三年級 1-5 班
+        };
+
+        const classSelect = document.getElementById('class-select');
+        const classList = []; // For sorting later
+
+        function initClassDropdown() {
+            for (let grade = 1; grade <= 3; grade++) {
+                const maxClass = classRanges[grade];
+                for (let cls = 1; cls <= maxClass; cls++) {
+                    const classValue = `${grade}${cls.toString().padStart(2, '0')}`; // e.g., 101, 204
+                    const className = `${grade}年${cls}班`;
+                    
+                    const option = document.createElement('option');
+                    option.value = classValue;
+                    option.textContent = className;
+                    classSelect.appendChild(option);
+                    
+                    classList.push({ code: parseInt(classValue), name: className });
+                }
+            }
+        }
+
+        // 3. Date Initialization (Today as default)
+        const dateInput = document.getElementById('date');
+        const adminDateInput = document.getElementById('admin-date-filter');
+        const todayStr = new Date().toISOString().split('T')[0];
+        
+        dateInput.value = todayStr;
+        dateInput.min = todayStr; // Prevent past dates
+        adminDateInput.value = todayStr;
+
+        initClassDropdown();
+
+        // 4. Submit Data Function
+        function submitData() {
+            const date = dateInput.value;
+            const classCode = document.getElementById('class-select').value;
+            const className = document.getElementById('class-select').selectedOptions[0]?.text;
+            const seatNo = document.getElementById('seat-no').value;
+            const type = document.querySelector('input[name="leaveType"]:checked').value;
+
+            if (!date || !classCode || !seatNo) {
+                alert("請填寫所有欄位");
+                return;
+            }
+
+            const btn = document.querySelector('#teacher-form button');
+            btn.disabled = true;
+            btn.textContent = "儲存中...";
+
+            db.collection("attendance").add({
+                date: date,
+                classCode: parseInt(classCode), // For sorting
+                className: className,
+                seatNo: parseInt(seatNo),
+                type: type,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            })
+            .then(() => {
+                showToast();
+                // Reset minimal fields
+                document.getElementById('seat-no').value = '';
+                btn.disabled = false;
+                btn.textContent = "送出資料";
+            })
+            .catch((error) => {
+                console.error("Error adding document: ", error);
+                alert("儲存失敗，請檢查網路");
+                btn.disabled = false;
+                btn.textContent = "送出資料";
+            });
+        }
+
+        // 5. Toast Notification
+        function showToast() {
+            const x = document.getElementById("toast");
+            x.className = "show";
+            setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+        }
+
+        // 6. Admin Functions
+        function toggleAdminView() {
+            const adminSection = document.getElementById('admin-section');
+            if (adminSection.style.display === 'block') {
+                adminSection.style.display = 'none';
+            } else {
+                adminSection.style.display = 'block';
+                document.getElementById('admin-section').scrollIntoView({behavior: "smooth"});
+            }
+        }
+
+        function checkLogin() {
+            const pwd = document.getElementById('admin-pwd').value;
+            if (pwd === '1234') {
+                document.getElementById('login-panel').style.display = 'none';
+                document.getElementById('data-panel').style.display = 'block';
+                startRealtimeListener();
+            } else {
+                alert("密碼錯誤");
+            }
+        }
+        
+        function logout() {
+            document.getElementById('login-panel').style.display = 'block';
+            document.getElementById('data-panel').style.display = 'none';
+            document.getElementById('admin-pwd').value = '';
+            if(unsubscribe) unsubscribe(); // Stop listening
+        }
+
+        let unsubscribe;
+
+        function startRealtimeListener() {
+            const filterDate = document.getElementById('admin-date-filter').value;
+            const container = document.getElementById('records-container');
+            
+            // Listen to Firestore changes
+            unsubscribe = db.collection("attendance")
+                .where("date", "==", filterDate)
+                .orderBy("classCode") // Sort by class (101 -> 305)
+                .orderBy("seatNo")
+                .onSnapshot((querySnapshot) => {
+                    container.innerHTML = "";
+                    
+                    if (querySnapshot.empty) {
+                        container.innerHTML = "<p style='text-align:center;'>本日目前無請假資料。</p>";
+                        return;
+                    }
+
+                    let currentClassCode = null;
+
+                    querySnapshot.forEach((doc) => {
+                        const data = doc.data();
+                        
+                        // Create Header if new class block
+                        if (data.classCode !== currentClassCode) {
+                            const header = document.createElement('div');
+                            header.className = 'class-header';
+                            header.textContent = data.className;
+                            container.appendChild(header);
+                            currentClassCode = data.classCode;
+                        }
+
+                        // Create Record Card
+                        const card = document.createElement('div');
+                        card.className = 'record-card';
+                        card.innerHTML = `
+                            <div>
+                                <strong>${data.seatNo} 號</strong>
+                            </div>
+                            <span class="tag ${data.type}">${data.type}</span>
+                        `;
+                        container.appendChild(card);
+                    });
+                });
+        }
+
+        // Update admin view when date filter changes
+        adminDateInput.addEventListener('change', () => {
+             if (document.getElementById('data-panel').style.display === 'block') {
+                 if(unsubscribe) unsubscribe();
+                 startRealtimeListener();
+             }
+        });
+
+    </script>
+</body>
+</html>
