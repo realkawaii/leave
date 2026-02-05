@@ -182,7 +182,7 @@
                     </div>
                     <div class="leave-option">
                         <input type="radio" name="leaveType" value="曠課" id="type-absent">
-                        <label class="leave-btn" for="type-absent">曠課<br><span style="font-size:0.8em; font-weight:normal;">(聯絡不上)</span></label>
+                        <label class="leave-btn" for="type-absent">曠課<br><span style="font-size:0.8em; font-weight:normal;">(連絡不上)</span></label>
                     </div>
                 </div>
             </div>
@@ -351,7 +351,7 @@
                         // Display logic for "旷课" special label in list if needed, or just type
                         // We store "曠課", CSS handles the styling.
                         let typeDisplay = d.type;
-                        if(typeDisplay === "曠課") typeDisplay = "曠課 (未聯絡)";
+                        if(typeDisplay === "曠課") typeDisplay = "曠課 (連絡不上)";
 
                         const div = document.createElement('div');
                         div.className = `record-item ${d.type}`;
@@ -407,7 +407,7 @@
                         }
                         
                         let typeDisplay = d.type;
-                        if(typeDisplay === "曠課") typeDisplay = "曠課 (未聯絡)";
+                        if(typeDisplay === "曠課") typeDisplay = "曠課 (連絡不上)";
 
                         const div = document.createElement('div');
                         div.className = `record-item ${d.type}`;
